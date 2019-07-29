@@ -1,0 +1,28 @@
+<mat-spinner *ngIf="!loaded;else content" [diameter]="50"></mat-spinner>
+<ng-template #content>
+	<mat-card *ngIf="error;else ords">
+		<mat-card-title>Something went wrong...</mat-card-title>
+		<mat-card-content>{{error.statusText}} ({{error.status}})</mat-card-content>
+	</mat-card>
+	<ng-template #ords>
+		<mat-card *ngFor="let order of displayOrders" class="mat-elevation-z8">
+			<mat-card-title>Order #{{order._id}}<br>form {{order.user}}</mat-card-title>
+			<mat-card-content class="mat-elevation-z2">
+				<div *ngFor="let product of order.products">
+					<div>{{product.name}}</div>
+					<div>{{product.number}}</div>
+					<div>${{product.cost}}</div>
+				</div>
+				<div>
+					<div>Total cost:</div>
+					<div></div>
+					<div>${{getTotalCost(order.products)}}</div>
+				</div>
+			</mat-card-content>
+			<mat-card-actions>
+				<button mat-raised-button color="accent" (click)="close(order._id)">Close</button>
+			</mat-card-actions>
+		</mat-card>
+		<mat-paginator [length]="orders.length" [pageSize]="defPageSize" [pageSizeOptions]="[3, 6, 9]" (page)="pageEvent = $event; setPage()"></mat-paginator>
+	</ng-template>
+</ng-template>

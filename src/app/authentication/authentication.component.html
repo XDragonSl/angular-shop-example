@@ -1,0 +1,26 @@
+<h1 mat-dialog-title>Authentication</h1>
+<div mat-dialog-content>
+	<mat-form-field *ngIf="newUser">
+		<input matInput placeholder="Name" [formControl]="name" required>
+		<mat-error *ngIf="name.invalid">{{nameErrorMessages()}}</mat-error>
+	</mat-form-field>
+	<mat-form-field>
+		<input matInput placeholder="Email" [formControl]="email" required>
+		<mat-error *ngIf="email.invalid">{{emailErrorMessages()}}</mat-error>
+	</mat-form-field>
+	<mat-form-field>
+		<input matInput placeholder="Password" [type]="passwordHide ? 'password' : 'text'" [formControl]="password" required>
+		<button mat-icon-button matSuffix (click)="passwordHide = !passwordHide">
+			<mat-icon>{{passwordHide ? 'visibility_off' : 'visibility'}}</mat-icon>
+		</button>
+		<mat-error *ngIf="password.invalid">{{passwordErrorMessages()}}</mat-error>
+	</mat-form-field>
+	<mat-checkbox color="primary" [(ngModel)]="remember">Remember me</mat-checkbox>
+</div>
+<div mat-dialog-actions>
+	<button mat-raised-button [mat-dialog-close]>Cancel</button>
+	<button *ngIf="disable();else submit" mat-raised-button disabled>Submit</button>
+	<ng-template #submit>
+		<button mat-raised-button color="accent" (click)="auth()">Submit</button>
+	</ng-template>
+</div>

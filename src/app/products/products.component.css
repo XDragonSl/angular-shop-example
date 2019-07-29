@@ -1,0 +1,13 @@
+mat-spinner {
+	margin: 30vh auto;
+}
+
+mat-card {
+	margin: 5vh auto;
+	max-width: 80%;
+}
+
+mat-card-actions {
+	display: flex;
+	justify-content: space-between;
+}

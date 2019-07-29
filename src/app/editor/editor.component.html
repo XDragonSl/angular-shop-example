@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>Product</h1>
+<div mat-dialog-content>
+	<mat-form-field>
+		<input matInput placeholder="Name" [formControl]="nameCtrl" required>
+		<mat-error *ngIf="nameCtrl.invalid">{{nameErrorMessages()}}</mat-error>
+	</mat-form-field>
+	<mat-form-field>
+		<input matInput placeholder="Cost" [formControl]="costCtrl" required>
+		<mat-error *ngIf="costCtrl.invalid">{{costErrorMessages()}}</mat-error>
+	</mat-form-field>
+</div>
+<div mat-dialog-actions>
+	<button mat-raised-button [mat-dialog-close]="true">Cancel</button>
+	<button *ngIf="disable();else submit" mat-raised-button disabled>Save</button>
+	<ng-template #submit>
+		<button mat-raised-button color="accent" (click)="save()">Save</button>
+	</ng-template>
+</div>
