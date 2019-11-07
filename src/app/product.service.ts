@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
+import { environment } from '../environments/environment';
+
 import { Product } from './product';
 
 @Injectable({
@@ -9,7 +11,7 @@ import { Product } from './product';
 })
 export class ProductService {
   
-  private apiUri = 'https://mean-shop-example-api.herokuapp.com/api/products/';
+  private apiUri = environment.apiUri + '/api/products/';
 
   constructor(private http: HttpClient) {}
   

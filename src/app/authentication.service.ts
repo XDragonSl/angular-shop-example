@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
+import { environment } from '../environments/environment';
+
 import { Authentication } from './authentication';
 
 @Injectable({
@@ -9,7 +11,7 @@ import { Authentication } from './authentication';
 })
 export class AuthenticationService {
     
-    private apiUri = 'https://mean-shop-example-api.herokuapp.com/api/';
+    private apiUri = environment.apiUri + '/api/';
 
     constructor(private http: HttpClient) {}
     
