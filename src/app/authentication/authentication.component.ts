@@ -3,8 +3,8 @@ import { FormControl, Validators } from '@angular/forms';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { MatSnackBar } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Authentication } from '../authentication';
 import { AuthenticationService } from '../authentication.service';
@@ -12,7 +12,7 @@ import { AuthenticationService } from '../authentication.service';
 @Component({
   selector: 'app-authentication',
   templateUrl: './authentication.component.html',
-  styleUrls: ['./authentication.component.css']
+  styleUrls: ['./authentication.component.scss']
 })
 export class AuthenticationComponent {
 

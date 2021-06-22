@@ -3,8 +3,8 @@ import { FormControl, Validators } from '@angular/forms';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { MatSnackBar } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -12,7 +12,7 @@ import { ProductService } from '../product.service';
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.css']
+  styleUrls: ['./editor.component.scss']
 })
 export class EditorComponent {
     
@@ -56,7 +56,7 @@ export class EditorComponent {
     
     save(): void {
         if (this.product){
-            this.productService.update(this.product._id, {
+            this.productService.update(this.product._id!, {
                 name: this.nameCtrl.value,
                 cost: this.costCtrl.value
             }).pipe(catchError(err => {

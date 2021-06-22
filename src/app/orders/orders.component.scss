@@ -1,0 +1,25 @@
+mat-spinner {
+	margin: 30vh auto;
+}
+
+mat-card {
+	margin: 5vh auto;
+	max-width: 80%;
+}
+
+mat-card-content {
+	padding: 1vh 3%;
+
+	div {
+		display: flex;
+		margin: 4vh auto;
+
+		div {
+			flex-basis: 33%;
+		}
+
+		&:last-child {
+			font-weight: bold;
+		}
+	}
+}

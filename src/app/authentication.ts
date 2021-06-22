@@ -1,3 +1,3 @@
 export class Authentication {
-    token: string
+    token?: string
 }

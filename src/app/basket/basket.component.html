@@ -9,11 +9,11 @@
 			<mat-card-title>{{product.name}}</mat-card-title>
 			<mat-card-content>{{product.number}} x ${{product.cost}}</mat-card-content>
 			<mat-card-actions>
-				<button mat-raised-button color="accent" (click)="remove(product.name, product._id)">Remove</button>
-				<button mat-raised-button color="accent" (click)="decrease(product.name, product._id)">Decrease</button>
+				<button mat-raised-button color="accent" (click)="remove(product.name!, product._id!)">Remove</button>
+				<button mat-raised-button color="accent" (click)="decrease(product.name!, product._id!)">Decrease</button>
 			</mat-card-actions>
 		</mat-card>
-		<mat-paginator [length]="products.length" [pageSize]="defPageSize" [pageSizeOptions]="[5, 10]" (page)="pageEvent = $event; setPage()"></mat-paginator>
+		<mat-paginator [length]="products!.length" [pageSize]="defPageSize" [pageSizeOptions]="[5, 10]" (page)="pageEvent = $event; setPage()"></mat-paginator>
 		<mat-card>
 			<mat-card-title>Total</mat-card-title>
 			<mat-card-content>${{sum}}</mat-card-content>

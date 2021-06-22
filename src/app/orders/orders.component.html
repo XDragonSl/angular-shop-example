@@ -23,6 +23,6 @@
 				<button mat-raised-button color="accent" (click)="close(order._id)">Close</button>
 			</mat-card-actions>
 		</mat-card>
-		<mat-paginator [length]="orders.length" [pageSize]="defPageSize" [pageSizeOptions]="[3, 6, 9]" (page)="pageEvent = $event; setPage()"></mat-paginator>
+		<mat-paginator [length]="orders!.length" [pageSize]="defPageSize" [pageSizeOptions]="[3, 6, 9]" (page)="pageEvent = $event; setPage()"></mat-paginator>
 	</ng-template>
 </ng-template>

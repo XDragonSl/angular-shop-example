@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { PageEvent } from '@angular/material';
-import { MatSnackBar } from '@angular/material';
+import { PageEvent } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -13,16 +13,16 @@ import { OrderService } from '../order.service';
 @Component({
   selector: 'app-basket',
   templateUrl: './basket.component.html',
-  styleUrls: ['./basket.component.css']
+  styleUrls: ['./basket.component.scss']
 })
 export class BasketComponent implements OnInit {
 
-    products: Array<ProductInBasket>;
-    displayProducts: Array<ProductInBasket>;
-    loadedProducts: Array<ProductInBasket>;
+    products?: Array<ProductInBasket>;
+    displayProducts?: Array<ProductInBasket>;
+    loadedProducts?: Array<ProductInBasket>;
     error: any;
     ordErr: any;
-    pageEvent: PageEvent;
+    pageEvent?: PageEvent;
 
     sum = 0;
     defPageSize = 5;
@@ -58,7 +58,7 @@ export class BasketComponent implements OnInit {
                     return of({});
                 })).subscribe((prod: Product) => {
                     if (!this.error) {
-                        this.loadedProducts.push(new ProductInBasket(prod));
+                        this.loadedProducts!.push(new ProductInBasket(prod));
                     }
                     ++num;
                     if (num === Object.keys(basket).length) {
@@ -71,7 +71,7 @@ export class BasketComponent implements OnInit {
     }
     
     setPage(): void {
-        this.displayProducts = this.products.slice(this.pageEvent.pageIndex * this.pageEvent.pageSize, this.pageEvent.pageIndex * this.pageEvent.pageSize + this.pageEvent.pageSize);
+        this.displayProducts = this.products!.slice(this.pageEvent!.pageIndex * this.pageEvent!.pageSize, this.pageEvent!.pageIndex * this.pageEvent!.pageSize + this.pageEvent!.pageSize);
     }
     
     calculate(): void {
@@ -79,12 +79,12 @@ export class BasketComponent implements OnInit {
         delete basket.shopVersion;
         this.products = [];
         this.sum = 0;
-        for (let i = 0; i < this.loadedProducts.length; i++) {
-            this.loadedProducts[i].number = basket[this.loadedProducts[i]._id] ? basket[this.loadedProducts[i]._id] : 0;
-            if (this.loadedProducts[i].number > 0) {
-                this.products.push(this.loadedProducts[i]);
+        for (let i = 0; i < this.loadedProducts!.length; i++) {
+            this.loadedProducts![i].number = basket[this.loadedProducts![i]._id!] ? basket[this.loadedProducts![i]._id!] : 0;
+            if (this.loadedProducts![i].number > 0) {
+                this.products.push(this.loadedProducts![i]);
             }
-            this.sum += this.loadedProducts[i].number * this.loadedProducts[i].cost;
+            this.sum += this.loadedProducts![i].number * this.loadedProducts![i].cost!;
         }
         if (this.pageEvent) {
             this.setPage();

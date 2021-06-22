@@ -9,14 +9,14 @@
 			<mat-card-title>{{product.name}}</mat-card-title>
 			<mat-card-content>${{product.cost}}</mat-card-content>
 			<mat-card-actions>
-				<button mat-raised-button color="accent" (click)="add(product.name, product._id)">Add</button>
+				<button mat-raised-button color="accent" (click)="add(product!.name!, product!._id!)">Add</button>
 				<span>
 					<button *ngIf="isAuth() && user.role === 'admin'" mat-raised-button color="warn" (click)="editor(product)">Edit</button>
-					<button *ngIf="isAuth() && user.role === 'admin'" mat-raised-button color="warn" (click)="remove(product._id)">Delete</button>
+					<button *ngIf="isAuth() && user.role === 'admin'" mat-raised-button color="warn" (click)="remove(product!._id!)">Delete</button>
 				</span>
 			</mat-card-actions>
 		</mat-card>
-		<mat-paginator [length]="products.length" [pageSize]="defPageSize" [pageSizeOptions]="[5, 10]" (page)="pageEvent = $event; setPage()"></mat-paginator>
+		<mat-paginator [length]="products!.length" [pageSize]="defPageSize" [pageSizeOptions]="[5, 10]" (page)="pageEvent = $event; setPage()"></mat-paginator>
 		<mat-card *ngIf="isAuth() && user.role === 'admin'">
 			<mat-card-actions>
 				<button mat-raised-button color="warn" (click)="editor(null)">New</button>
