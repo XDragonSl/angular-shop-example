@@ -5,13 +5,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { ConfirmComponent } from '../confirm/confirm.component';
-import { Product } from '../product';
-import { ProductInBasket } from '../product-in-basket';
-import { ProductService } from '../product.service';
-import { Order } from '../order';
-import { OrderTable } from '../order-table';
-import { OrderService } from '../order.service';
+import { ConfirmComponent } from '../../shared/components/confirm/confirm.component';
+import { Product } from '../../shared/models/product';
+import { ProductInBasket } from '../../shared/models/product-in-basket';
+import { ProductService } from '../../shared/services/product.service';
+import { Order } from '../../shared/models/order';
+import { OrderTable } from '../../shared/models/order-table';
+import { OrderService } from '../../shared/services/order.service';
 
 @Component({
   selector: 'app-orders',

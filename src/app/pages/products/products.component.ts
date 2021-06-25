@@ -5,10 +5,10 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { ConfirmComponent } from '../confirm/confirm.component';
-import { EditorComponent } from '../editor/editor.component';
-import { Product } from '../product';
-import { ProductService } from '../product.service';
+import { ConfirmComponent } from '../../shared/components/confirm/confirm.component';
+import { EditorComponent } from '../../shared/components/editor/editor.component';
+import { Product } from '../../shared/models/product';
+import { ProductService } from '../../shared/services/product.service';
 
 @Component({
   selector: 'app-products',

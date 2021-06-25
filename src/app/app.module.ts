@@ -21,12 +21,12 @@ import { MatTableModule } from '@angular/material/table';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { AuthenticationComponent } from './authentication/authentication.component';
-import { BasketComponent } from './basket/basket.component';
-import { ConfirmComponent } from './confirm/confirm.component';
-import { EditorComponent } from './editor/editor.component';
-import { OrdersComponent } from './orders/orders.component';
-import { ProductsComponent } from './products/products.component';
+import { AuthenticationComponent } from './shared/components/authentication/authentication.component';
+import { BasketComponent } from './pages/basket/basket.component';
+import { ConfirmComponent } from './shared/components/confirm/confirm.component';
+import { EditorComponent } from './shared/components/editor/editor.component';
+import { OrdersComponent } from './pages/orders/orders.component';
+import { ProductsComponent } from './pages/products/products.component';
 
 @NgModule({
   declarations: [

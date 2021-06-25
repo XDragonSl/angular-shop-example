@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
 
-import { AuthenticationComponent } from './authentication/authentication.component';
+import { AuthenticationComponent } from './shared/components/authentication/authentication.component';
 
 @Component({
   selector: 'app-root',

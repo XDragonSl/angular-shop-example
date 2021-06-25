@@ -6,8 +6,8 @@ import { catchError } from 'rxjs/operators';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { Authentication } from '../authentication';
-import { AuthenticationService } from '../authentication.service';
+import { Authentication } from '../../models/authentication';
+import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
   selector: 'app-authentication',

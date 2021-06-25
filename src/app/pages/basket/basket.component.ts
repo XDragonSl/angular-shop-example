@@ -4,11 +4,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { Product } from '../product';
-import { ProductInBasket } from '../product-in-basket';
-import { ProductService } from '../product.service';
-import { Order } from '../order';
-import { OrderService } from '../order.service';
+import { Product } from '../../shared/models/product';
+import { ProductInBasket } from '../../shared/models/product-in-basket';
+import { ProductService } from '../../shared/services/product.service';
+import { Order } from '../../shared/models/order';
+import { OrderService } from '../../shared/services/order.service';
 
 @Component({
   selector: 'app-basket',
