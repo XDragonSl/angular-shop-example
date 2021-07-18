@@ -14,6 +14,6 @@ export class StateService {
 
     static getUser(): User | undefined {
         const base64 = sessionStorage.token?.split('.')[1];
-        return base64 ? JSON.parse(atob(base64)) : undefined;
+        return base64 ? JSON.parse(decodeURIComponent(escape(atob(base64)))) : undefined;
     }
 }

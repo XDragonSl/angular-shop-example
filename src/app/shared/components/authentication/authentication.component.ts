@@ -69,7 +69,13 @@ export class AuthenticationComponent {
                     error.status === 401 ? this.toastService.show(error.error.message) : this.toastService.showDefaultError();
                     return throwError(error);
                 }))
-                .subscribe(this.saveToken);
+                .subscribe((auth: Authentication) => {
+                    sessionStorage.token = auth.token;
+                    if (this.remember) {
+                        localStorage.token = sessionStorage.token;
+                    }
+                    this.dialogRef.close();
+                });
         } else {
             this.authenticationService
                 .login(this.email.value, this.password.value)
@@ -77,15 +83,13 @@ export class AuthenticationComponent {
                     error.status === 401 ? this.toastService.show(error.error.message) : this.toastService.showDefaultError();
                     return throwError(error);
                 }))
-                .subscribe(this.saveToken);
+                .subscribe((auth: Authentication) => {
+                    sessionStorage.token = auth.token;
+                    if (this.remember) {
+                        localStorage.token = sessionStorage.token;
+                    }
+                    this.dialogRef.close();
+                });
         }
-    }
-
-    saveToken(auth: Authentication): void {
-        sessionStorage.token = auth.token;
-        if (this.remember) {
-            localStorage.token = sessionStorage.token;
-        }
-        this.dialogRef.close();
     }
 }
