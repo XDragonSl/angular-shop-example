@@ -1,14 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { of } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { ConfirmComponent } from '../../shared/components/confirm/confirm.component';
 import { EditorComponent } from '../../shared/components/editor/editor.component';
-import { Product } from '../../shared/models/product';
 import { ProductService } from '../../shared/services/product.service';
+import { ToastService } from '../../shared/services/toast.service';
+import { StateService } from '../../shared/services/state.service';
+import { Product } from '../../shared/interfaces/product.interface';
+import { User } from '../../shared/interfaces/user.interface';
+import { Role } from '../../shared/enums/role.enum';
 
 @Component({
   selector: 'app-products',
@@ -17,34 +20,37 @@ import { ProductService } from '../../shared/services/product.service';
 })
 export class ProductsComponent implements OnInit {
 
-    products?: Array<Product>;
-    displayProducts?: Array<Product>;
-    error: any;
-    user: any;
-    pageEvent?: PageEvent;
+    user?: User;
 
+    role = Role;
+    products = new Array<Product>();
+    displayProducts = new Array<Product>();
     defPageSize = 5;
+    isAuth = false;
     loaded = false;
 
-    constructor(private productService: ProductService, private snackBar: MatSnackBar, public dialog: MatDialog) { }
+    constructor(private productService: ProductService, private toastService: ToastService, public dialog: MatDialog) {}
 
     ngOnInit() {
         this.getProducts();
+        // FixMe implement without setInterval
+        setInterval(() => {
+            this.isAuth = StateService.isAuth();
+            this.user = StateService.getUser();
+        });
     }
 
     getProducts(): void {
-        this.productService.getAll().pipe(catchError(err => {
-            this.error = err;
-            return of([]);
+        this.loaded = false;
+        this.productService.getAll().pipe(catchError(error => {
+            this.toastService.showDefaultError();
+            this.loaded = true;
+            return throwError(error);
         })).subscribe((prods: Array<Product>) => {
             this.products = prods;
             this.displayProducts = this.products.slice(0, this.defPageSize);
             this.loaded = true;
         });
-    }
-
-    setPage(): void {
-        this.displayProducts = this.products!.slice(this.pageEvent!.pageIndex * this.pageEvent!.pageSize, this.pageEvent!.pageIndex * this.pageEvent!.pageSize + this.pageEvent!.pageSize);
     }
 
     add(name: string, id: string): void {
@@ -53,9 +59,7 @@ export class ProductsComponent implements OnInit {
         } else {
             localStorage[id] = +localStorage[id] + 1;
         }
-        this.snackBar.open(name + ' added to basket', 'Cancel', {
-            duration: 2000
-        }).onAction().subscribe(() => {
+        this.toastService.show(`${name} added to basket`, 'Cancel').onAction().subscribe(() => {
             if (+localStorage[id] > 1) {
                 localStorage[id] = +localStorage[id] - 1;
             } else {
@@ -65,48 +69,38 @@ export class ProductsComponent implements OnInit {
     }
 
     remove(id: string): void {
-        let dialogRef = this.dialog.open(ConfirmComponent, {
+        this.dialog.open(ConfirmComponent, {
             minWidth: '200px',
             width: '20vw'
-        });
-        dialogRef.afterClosed().subscribe((confirm) => {
+        }).afterClosed().subscribe((confirm) => {
             if (confirm) {
-                this.productService.remove(id).pipe(catchError(err => {
-                    this.error = err;
-                    return of();
+                this.productService.remove(id).pipe(catchError(error => {
+                    this.toastService.showDefaultError();
+                    return throwError(error);
                 })).subscribe(() => {
-                    if (!this.error) {
-                        this.snackBar.open('Successfully deleted', 'Ok', {
-                            duration: 2000
-                        });
-                        this.loaded = false;
-                        this.getProducts();
-                    }
+                    this.toastService.show('Successfully deleted');
+                    this.getProducts();
                 });
             }
         });
     }
 
     editor(prod: Product | null) {
-        let dialogRef = this.dialog.open(EditorComponent, {
+        this.dialog.open(EditorComponent, {
             minWidth: '300px',
             width: '60vw',
             data: prod
-        });
-        dialogRef.afterClosed().subscribe((cancel) => {
+        }).afterClosed().subscribe((cancel) => {
             if (!cancel) {
-                this.loaded = false;
                 this.getProducts();
             }
         });
     }
 
-    isAuth(): boolean {
-        if (sessionStorage.token) {
-            this.user = JSON.parse(atob(sessionStorage.token.split('.')[1]));
-            return true;
-        } else {
-            return false;
-        }
+    setPage(pageEvent: PageEvent): void {
+        this.displayProducts = this.products.slice(
+            pageEvent.pageIndex * pageEvent.pageSize,
+            pageEvent.pageIndex * pageEvent.pageSize + pageEvent.pageSize
+        );
     }
 }

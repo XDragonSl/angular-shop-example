@@ -4,7 +4,8 @@
 
 export const environment = {
     production: false,
-    apiUri: 'https://shop-example-api.herokuapp.com'
+    apiUri: 'https://shop-example-api.herokuapp.com/api',
+    shopVersion: '000'
 };
 
 /*

@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { of } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { Product } from '../../shared/models/product';
-import { ProductInBasket } from '../../shared/models/product-in-basket';
+import { Product } from '../../shared/interfaces/product.interface';
+import { ProductInBasket } from '../../shared/models/product-in-basket.model';
 import { ProductService } from '../../shared/services/product.service';
-import { Order } from '../../shared/models/order';
+import { Order } from '../../shared/models/order.model';
 import { OrderService } from '../../shared/services/order.service';
+import { StateService } from '../../shared/services/state.service';
+import { ToastService } from '../../shared/services/toast.service';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-basket',
@@ -17,36 +18,32 @@ import { OrderService } from '../../shared/services/order.service';
 })
 export class BasketComponent implements OnInit {
 
-    products?: Array<ProductInBasket>;
-    displayProducts?: Array<ProductInBasket>;
-    loadedProducts?: Array<ProductInBasket>;
-    error: any;
-    ordErr: any;
-    pageEvent?: PageEvent;
-
+    products = new Array<ProductInBasket>();
+    displayProducts = new Array<ProductInBasket>();
+    loadedProducts = new Array<ProductInBasket>();
     sum = 0;
     defPageSize = 5;
+    isAuth = false;
     loaded = false;
 
-    constructor(private productService: ProductService, private orderService: OrderService, private snackBar: MatSnackBar) { }
+    constructor(
+        private productService: ProductService,
+        private orderService: OrderService,
+        private toastService: ToastService
+    ) { }
 
     ngOnInit() {
         this.getProducts();
+        // FixMe implement without setInterval
+        setInterval(() => {
+            this.isAuth = StateService.isAuth();
+        });
     }
-    
-    isAuth(): boolean {
-        if (sessionStorage.token) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
+
     getProducts(): void {
-        let basket = (<any>Object).assign({}, localStorage);
-        delete basket.shopVersion;
-        delete basket.token;
-        this.loadedProducts = [];
+        this.loaded = false;
+        this.loadedProducts = new Array<ProductInBasket>();
+        let basket = this.getBasket();
         let num = 0;
         if (Object.keys(basket).length === 0) {
             this.calculate();
@@ -54,12 +51,10 @@ export class BasketComponent implements OnInit {
         } else {
             for (let i = 0; i < Object.keys(basket).length; i++) {
                 this.productService.get(Object.keys(basket)[i]).pipe(catchError(err => {
-                    this.error = err;
-                    return of({});
+                    this.toastService.showDefaultError();
+                    return throwError(err);
                 })).subscribe((prod: Product) => {
-                    if (!this.error) {
-                        this.loadedProducts!.push(new ProductInBasket(prod));
-                    }
+                    this.loadedProducts.push(new ProductInBasket(prod));
                     ++num;
                     if (num === Object.keys(basket).length) {
                         this.calculate();
@@ -70,38 +65,13 @@ export class BasketComponent implements OnInit {
         }
     }
     
-    setPage(): void {
-        this.displayProducts = this.products!.slice(this.pageEvent!.pageIndex * this.pageEvent!.pageSize, this.pageEvent!.pageIndex * this.pageEvent!.pageSize + this.pageEvent!.pageSize);
-    }
-    
-    calculate(): void {
-        let basket = (<any>Object).assign({}, localStorage);
-        delete basket.shopVersion;
-        this.products = [];
-        this.sum = 0;
-        for (let i = 0; i < this.loadedProducts!.length; i++) {
-            this.loadedProducts![i].number = basket[this.loadedProducts![i]._id!] ? basket[this.loadedProducts![i]._id!] : 0;
-            if (this.loadedProducts![i].number > 0) {
-                this.products.push(this.loadedProducts![i]);
-            }
-            this.sum += this.loadedProducts![i].number * this.loadedProducts![i].cost!;
-        }
-        if (this.pageEvent) {
-            this.setPage();
-        } else {
-            this.displayProducts = this.products.slice(0, this.defPageSize);
-        }
-    }
-    
     decrease(name: string, id: string): void {
         if (+localStorage[id] > 1) {
             localStorage[id] = +localStorage[id] - 1;
         } else {
             delete localStorage[id];
         }
-        this.snackBar.open('Number of ' + name + ' decreased in basket', 'Cancel', {
-            duration: 2000
-        }).onAction().subscribe(() => {
+        this.toastService.show(`Number of ${name} decreased in basket`, 'Cancel').onAction().subscribe(() => {
             if (!localStorage[id]) {
                 localStorage[id] = 1;
             } else {
@@ -115,9 +85,7 @@ export class BasketComponent implements OnInit {
     remove(name: string, id: string): void {
         let num = localStorage[id];
         delete localStorage[id];
-        this.snackBar.open(name + ' removed from basket', 'Cancel', {
-            duration: 2000
-        }).onAction().subscribe(() => {
+        this.toastService.show(`${name} removed from basket`, 'Cancel').onAction().subscribe(() => {
             localStorage[id] = num;
             this.calculate();
         });
@@ -125,17 +93,11 @@ export class BasketComponent implements OnInit {
     }
     
     clear(): void {
-        let basket = (<any>Object).assign({}, localStorage);
-        localStorage.clear();
-        localStorage.shopVersion = basket.shopVersion;
-        if (basket.token) {
-            localStorage.token = basket.token;
-        }
-        this.snackBar.open('Basket cleared', 'Cancel', {
-            duration: 2000
-        }).onAction().subscribe(() => {
+        let basket = this.getBasket();
+        this.clearBasket();
+        this.toastService.show('Basket cleared', 'Cancel').onAction().subscribe(() => {
             for (let i in basket) {
-                localStorage[i] = basket[i];
+                localStorage[i] = basket[i]; // ToDo check hasOwnProperty
             }
             this.calculate();
         });
@@ -143,43 +105,60 @@ export class BasketComponent implements OnInit {
     }
     
     order(): void {
-        let basket = (<any>Object).assign({}, localStorage);
-        delete basket.shopVersion;
-        delete basket.token;
-        let nums = [];
-        let order = new Order();
+        let basket = this.getBasket();
         if (Object.keys(basket).length === 0) {
-            this.snackBar.open('Basket is emtpy, nothing to order!', 'Ok', {
-                duration: 2000
-            });
+            this.toastService.show('Basket is empty, nothing to order!');
         } else {
-            for (let i = 0; i < Object.keys(basket).length; i++) {
-                nums.push(basket[Object.keys(basket)[i]]);
-            }
-            order.products = Object.keys(basket).join(',');
-            order.numbers = nums.join(',');
-            this.orderService.create(order).pipe(catchError(err => {
-                this.ordErr = err;
-                this.snackBar.open('Sorry, something went wrong, try again', 'Ok', {
-                    duration: 2000
-                });
-                return of({});
-            })).subscribe((ord: Order) => {
-                if (!this.ordErr) {
-                    this.snackBar.open('Order successfully submitted!', 'Ok', {
-                        duration: 2000
-                    });
-                    let basket = (<any>Object).assign({}, localStorage);
-                    localStorage.clear();
-                    localStorage.shopVersion = basket.shopVersion;
-                    if (basket.token) {
-                        localStorage.token = basket.token;
-                    }
-                    this.calculate();
-                } else {
-                    this.ordErr = null;
-                }
+            this.orderService.create(
+                new Order(
+                    Object.keys(basket).join(','),
+                    Object.values(basket).join(',')
+                )
+            ).pipe(catchError(error => {
+                this.toastService.showDefaultError();
+                return throwError(error);
+            })).subscribe((_: Order) => {
+                this.toastService.show('Order successfully submitted!');
+                this.clearBasket();
+                this.calculate();
             });
         }
+    }
+
+    calculate(): void {
+        let basket = this.getBasket();
+        this.products = new Array<ProductInBasket>();
+        this.sum = this.loadedProducts.reduce((sum: number, product: ProductInBasket, index: number) => {
+            const count: number = basket[product._id!] ?? 0;
+            this.loadedProducts[index].number = count;
+            if (count > 0) {
+                this.products.push(product);
+            }
+            return sum + product.number * product.cost;
+        }, 0);
+        this.displayProducts = this.products.slice(0, this.defPageSize);
+    }
+
+    getBasket(): any  {
+        let basket = Object.assign({}, localStorage);
+        delete basket.shopVersion;
+        delete basket.token;
+        return basket;
+    }
+
+    clearBasket(): void {
+        let basket = Object.assign({}, localStorage);
+        localStorage.clear();
+        localStorage.shopVersion = basket.shopVersion;
+        if (basket.token) {
+            localStorage.token = basket.token;
+        }
+    }
+
+    setPage(pageEvent: PageEvent): void {
+        this.displayProducts = this.products.slice(
+            pageEvent.pageIndex * pageEvent.pageSize,
+            pageEvent.pageIndex * pageEvent.pageSize + pageEvent.pageSize
+        );
     }
 }

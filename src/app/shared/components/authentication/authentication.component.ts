@@ -1,18 +1,18 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { of } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-import { Authentication } from '../../models/authentication';
+import { Authentication } from '../../interfaces/authentication.interface';
 import { AuthenticationService } from '../../services/authentication.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-authentication',
   templateUrl: './authentication.component.html',
-  styleUrls: ['./authentication.component.scss']
+  styleUrls: ['./../../styles/dialog.scss']
 })
 export class AuthenticationComponent {
 
@@ -22,7 +22,12 @@ export class AuthenticationComponent {
     passwordHide = true;
     remember = true;
     
-    constructor(private authenticationService: AuthenticationService, private snackBar: MatSnackBar, public dialogRef: MatDialogRef<AuthenticationComponent>, @Inject(MAT_DIALOG_DATA) public newUser: boolean) { }
+    constructor(
+        private authenticationService: AuthenticationService,
+        private toastService: ToastService,
+        private dialogRef: MatDialogRef<AuthenticationComponent>,
+        @Inject(MAT_DIALOG_DATA) public newUser: boolean
+    ) { }
     
     nameErrorMessages(): string {
         let message = '';
@@ -51,56 +56,36 @@ export class AuthenticationComponent {
     }
     
     disable(): boolean {
-        if (this.newUser) {
-            return this.name.invalid || this.email.invalid || this.password.invalid;
-        } else {
-            return this.email.invalid || this.password.invalid;
-        }
+        return this.newUser
+            ? this.name.invalid || this.email.invalid || this.password.invalid
+            : this.email.invalid || this.password.invalid;
     }
     
     auth(): void {
         if (this.newUser) {
-            this.authenticationService.register(this.name.value, this.email.value, this.password.value).pipe(catchError(err => {
-                let message = '';
-                if (err.status === 401) {
-                    message = err.error.message;
-                } else {
-                    message = 'Sorry, something went wrong, try again';
-                }
-                this.snackBar.open(message, 'Ok', {
-                    duration: 2000
-                });
-                return of({});
-            })).subscribe((auth: Authentication) => {
-                if (auth.token) {
-                    sessionStorage.token = auth.token;
-                    if (this.remember) {
-                        localStorage.token = sessionStorage.token;
-                    }
-                    this.dialogRef.close();
-                }
-            });
+            this.authenticationService
+                .register(this.name.value, this.email.value, this.password.value)
+                .pipe(catchError(error => {
+                    error.status === 401 ? this.toastService.show(error.error.message) : this.toastService.showDefaultError();
+                    return throwError(error);
+                }))
+                .subscribe(this.saveToken);
         } else {
-            this.authenticationService.login(this.email.value, this.password.value).pipe(catchError(err => {
-                let message = '';
-                if (err.status === 401) {
-                    message = err.error.message;
-                } else {
-                    message = 'Sorry, something went wrong, try again';
-                }
-                this.snackBar.open(message, 'Ok', {
-                    duration: 2000
-                });
-                return of({});
-            })).subscribe((auth: Authentication) => {
-                if (auth.token) {
-                    sessionStorage.token = auth.token;
-                    if (this.remember) {
-                        localStorage.token = sessionStorage.token;
-                    }
-                    this.dialogRef.close();
-                }
-            });
+            this.authenticationService
+                .login(this.email.value, this.password.value)
+                .pipe(catchError(error => {
+                    error.status === 401 ? this.toastService.show(error.error.message) : this.toastService.showDefaultError();
+                    return throwError(error);
+                }))
+                .subscribe(this.saveToken);
         }
+    }
+
+    saveToken(auth: Authentication): void {
+        sessionStorage.token = auth.token;
+        if (this.remember) {
+            localStorage.token = sessionStorage.token;
+        }
+        this.dialogRef.close();
     }
 }

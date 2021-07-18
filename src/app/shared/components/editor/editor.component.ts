@@ -1,30 +1,37 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { of } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { Product } from '../../models/product';
+import { Product } from '../../interfaces/product.interface';
 import { ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.scss']
+  styleUrls: ['./../../styles/dialog.scss']
 })
-export class EditorComponent {
-    
-    error: any;
+export class EditorComponent implements OnInit{
 
     nameCtrl = new FormControl('', [Validators.required]);
-    costCtrl = new FormControl('', [Validators.required, Validators.pattern(/^[+]?((\d+\.?\d*)|(\d*\.?\d+))$/), Validators.min(0.01)]);
+    costCtrl = new FormControl('', [Validators.required,
+                                                         Validators.pattern(/^[+]?((\d+\.?\d*)|(\d*\.?\d+))$/),
+                                                         Validators.min(0.01)]);
+    isNew = true;
 
-    constructor(private productService: ProductService, private snackBar: MatSnackBar, public dialogRef: MatDialogRef<EditorComponent>, @Inject(MAT_DIALOG_DATA) public product: Product) { }
+    constructor(
+        private productService: ProductService,
+        private snackBar: MatSnackBar,
+        private dialogRef: MatDialogRef<EditorComponent>,
+        @Inject(MAT_DIALOG_DATA) private product: Product
+    ) { }
     
     ngOnInit() {
         if (this.product) {
+            this.isNew = false;
             this.nameCtrl.setValue(this.product.name);
             this.costCtrl.setValue(this.product.cost);
         }
@@ -55,43 +62,35 @@ export class EditorComponent {
     }
     
     save(): void {
-        if (this.product){
-            this.productService.update(this.product._id!, {
-                name: this.nameCtrl.value,
-                cost: this.costCtrl.value
-            }).pipe(catchError(err => {
-                this.error = err;
-                this.snackBar.open('Sorry, something went wrong, try again', 'Ok', {
-                    duration: 2000
-                });
-                return of({});
-            })).subscribe((prod: Product) => {
-                if (!this.error) {
-                    this.snackBar.open('Successfully updated', 'Ok', {
-                        duration: 2000
-                    });
-                    this.dialogRef.close();
-                }
-                this.error = null;
-            });
-        } else {
+        if (this.isNew){
             this.productService.create({
                 name: this.nameCtrl.value,
                 cost: this.costCtrl.value
             }).pipe(catchError(err => {
-                this.error = err;
                 this.snackBar.open('Sorry, something went wrong, try again', 'Ok', {
                     duration: 2000
                 });
-                return of({});
-            })).subscribe((prod: Product) => {
-                if (!this.error) {
-                    this.snackBar.open('Successfully created', 'Ok', {
-                        duration: 2000
-                    });
-                    this.dialogRef.close();
-                }
-                this.error = null;
+                return throwError(err);
+            })).subscribe((_: Product) => {
+                this.snackBar.open('Successfully created', 'Ok', {
+                    duration: 2000
+                });
+                this.dialogRef.close();
+            });
+        } else {
+            this.productService.update(this.product._id!, {
+                name: this.nameCtrl.value,
+                cost: this.costCtrl.value
+            }).pipe(catchError(err => {
+                this.snackBar.open('Sorry, something went wrong, try again', 'Ok', {
+                    duration: 2000
+                });
+                return throwError(err);
+            })).subscribe((_: Product) => {
+                this.snackBar.open('Successfully updated', 'Ok', {
+                    duration: 2000
+                });
+                this.dialogRef.close();
             });
         }
     }

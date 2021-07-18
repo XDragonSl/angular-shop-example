@@ -4,27 +4,27 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { environment } from '../../../environments/environment';
 
-import { Order } from '../models/order';
+import { Order } from '../models/order.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
     
-    private apiUri = environment.apiUri + '/api/orders/';
+    private apiUri = `${environment.apiUri}/orders`;
 
     constructor(private http: HttpClient) {}
     
     headers(): Object {
         return {
             headers: new HttpHeaders({
-                'Authorization': 'Bearer ' + sessionStorage.token
+                'Authorization': `Bearer ${sessionStorage.token}`
             })
         };
     }
     
     get(id: string): Observable<Order> {
-        return this.http.get<Order>(this.apiUri + id, this.headers());
+        return this.http.get<Order>(`${this.apiUri}/${id}`, this.headers());
     }
     
     getAll(): Observable<Array<Order>> {
@@ -36,10 +36,10 @@ export class OrderService {
     }
     
     update(id: string, Order: Order): Observable<Order> {
-        return this.http.put<Order>(this.apiUri + id, Order, this.headers());
+        return this.http.put<Order>(`${this.apiUri}/${id}`, Order, this.headers());
     }
     
     remove(id: string): Observable<void> {
-        return this.http.delete<void>(this.apiUri + id, this.headers());
+        return this.http.delete<void>(`${this.apiUri}/${id}`, this.headers());
     }
 }

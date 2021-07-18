@@ -1,4 +1,4 @@
-#title {
+.title {
     flex: 0 0 auto;
     justify-content: center;
 
@@ -7,11 +7,11 @@
     }
 }
 
-#container {
+.container {
     flex: 1 0 auto;
 }
 
-#copyright {
+.copyright {
     flex: 0 0 auto;
     font-size: 2.5vh;
 }
