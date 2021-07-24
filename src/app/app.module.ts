@@ -27,6 +27,7 @@ import { ConfirmComponent } from './shared/components/confirm/confirm.component'
 import { EditorComponent } from './shared/components/editor/editor.component';
 import { OrdersComponent } from './pages/orders/orders.component';
 import { ProductsComponent } from './pages/products/products.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { ProductsComponent } from './pages/products/products.component';
     ConfirmComponent,
     EditorComponent,
     OrdersComponent,
-    ProductsComponent
+    ProductsComponent,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,

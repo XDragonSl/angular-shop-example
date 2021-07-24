@@ -12,7 +12,7 @@ import { ToastService } from '../../services/toast.service';
 @Component({
   selector: 'app-authentication',
   templateUrl: './authentication.component.html',
-  styleUrls: ['./../../styles/dialog.scss']
+  styleUrls: ['../../styles/_dialog.scss']
 })
 export class AuthenticationComponent {
 

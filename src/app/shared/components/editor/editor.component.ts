@@ -12,7 +12,7 @@ import { ProductService } from '../../services/product.service';
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
-  styleUrls: ['./../../styles/dialog.scss']
+  styleUrls: ['../../styles/_dialog.scss']
 })
 export class EditorComponent implements OnInit{
 

@@ -1,11 +1,5 @@
-mat-spinner {
-	margin: 30vh auto;
-}
-
-mat-card {
-	margin: 5vh auto;
-	max-width: 80%;
-}
+@import "../../shared/styles/spinner";
+@import "../../shared/styles/card";
 
 mat-card-actions {
 	display: flex;
