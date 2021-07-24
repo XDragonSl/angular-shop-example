@@ -1,0 +1,19 @@
+@import "../../shared/styles/spinner";
+@import "../../shared/styles/card";
+
+mat-card-content {
+	padding: 1vh 3%;
+
+	div {
+		display: flex;
+		margin: 4vh auto;
+
+		div {
+			flex-basis: 33%;
+		}
+
+		&:last-child {
+			font-weight: bold;
+		}
+	}
+}

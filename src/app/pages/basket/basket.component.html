@@ -1,0 +1,30 @@
+<mat-spinner *ngIf="!loaded;else content" [diameter]="50"></mat-spinner>
+<ng-template #content>
+	<mat-card *ngFor="let product of displayProducts" class="mat-elevation-z8">
+		<mat-card-title>{{product.name}}</mat-card-title>
+		<mat-card-content>{{product.number}} x ${{product.cost}}</mat-card-content>
+		<mat-card-actions>
+			<button mat-raised-button color="accent" (click)="remove(product.name, product._id!)">Remove</button>
+			<button mat-raised-button color="accent" (click)="decrease(product.name, product._id!)">Decrease</button>
+		</mat-card-actions>
+	</mat-card>
+	<mat-paginator
+			[length]="products.length"
+			[pageSize]="defPageSize"
+			[pageSizeOptions]="[5, 10]"
+			(page)="setPage($event)"
+	></mat-paginator>
+	<mat-card>
+		<mat-card-title>Total</mat-card-title>
+		<mat-card-content>${{sum}}</mat-card-content>
+		<mat-card-actions>
+			<button mat-raised-button color="warn" (click)="clear()">Clear basket</button>
+			<button
+					mat-raised-button color="warn"
+					[matTooltip]="isAuth ? '' : 'Sign in or sign up to order'"
+					(click)="order()"
+					[disabled]="!isAuth"
+			>Order</button>
+		</mat-card-actions>
+	</mat-card>
+</ng-template>

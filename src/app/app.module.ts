@@ -1,8 +1,8 @@
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -19,28 +19,26 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
 
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ProductsComponent } from './products/products.component';
-import { BasketComponent } from './basket/basket.component';
-import { AuthenticationComponent } from './authentication/authentication.component';
-import { OrdersComponent } from './orders/orders.component';
-import { ConfirmComponent } from './confirm/confirm.component';
-import { EditorComponent } from './editor/editor.component';
+import { AuthenticationComponent } from './shared/components/authentication/authentication.component';
+import { BasketComponent } from './pages/basket/basket.component';
+import { ConfirmComponent } from './shared/components/confirm/confirm.component';
+import { EditorComponent } from './shared/components/editor/editor.component';
+import { OrdersComponent } from './pages/orders/orders.component';
+import { ProductsComponent } from './pages/products/products.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProductsComponent,
+    AuthenticationComponent,
     BasketComponent,
-    AuthenticationComponent,
+    ConfirmComponent,
+    EditorComponent,
     OrdersComponent,
-    ConfirmComponent,
-    EditorComponent
-  ],
-  entryComponents: [
-    AuthenticationComponent,
-    ConfirmComponent,
-    EditorComponent
+    ProductsComponent,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -61,7 +59,8 @@ import { EditorComponent } from './editor/editor.component';
     MatIconModule,
     MatCheckboxModule,
     MatTooltipModule,
-    MatTableModule
+    MatTableModule,
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

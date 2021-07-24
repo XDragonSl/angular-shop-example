@@ -1,57 +1,56 @@
 import { Component, OnInit } from '@angular/core';
 
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 
-import { AuthenticationComponent } from './authentication/authentication.component';
+import { environment } from '../environments/environment';
+import { AuthenticationComponent } from './shared/components/authentication/authentication.component';
+import { StateService } from './shared/services/state.service';
+import { User } from './shared/interfaces/user.interface';
+import { Role } from './shared/enums/role.enum';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
 
-  private shopVersion = '008';
+    user?: User;
 
-  title = 'Shop';
-  
-  user: any;
-  
-  constructor(public dialog: MatDialog) {}
-  
-  ngOnInit() {
-      this.checkVersion();
-      if (localStorage.token) {
-          sessionStorage.token = localStorage.token;
-      }
-  }
-  
-  checkVersion(): void {
-      if (localStorage.shopVersion !== this.shopVersion) {
-          localStorage.clear();
-          localStorage.shopVersion = this.shopVersion;
-      }
-  }
-  
-  auth(newUser: boolean): void {
-      this.dialog.open(AuthenticationComponent, {
-          minWidth: '250px',
-          width: '50vw',
-          data: newUser
-      });
-  }
-  
-  isAuth(): boolean {
-      if (sessionStorage.token) {
-          this.user = JSON.parse(atob(sessionStorage.token.split('.')[1]));
-          return true;
-      } else {
-          return false;
-      }
-  }
-  
-  out(): void {
-      delete localStorage.token;
-      delete sessionStorage.token;
-  }
+    role = Role;
+    isAuth = false;
+
+    constructor(private dialog: MatDialog) {}
+
+    ngOnInit() {
+        this.checkVersion();
+        if (localStorage.token) {
+            sessionStorage.token = localStorage.token;
+        }
+        // FixMe implement without setInterval
+        setInterval(() => {
+            this.isAuth = StateService.isAuth();
+            this.user = StateService.getUser();
+        });
+    }
+
+    checkVersion(): void {
+        if (localStorage.shopVersion !== environment.shopVersion) {
+            localStorage.clear();
+            localStorage.shopVersion = environment.shopVersion;
+        }
+    }
+
+    auth(newUser: boolean): void {
+        this.dialog.open(AuthenticationComponent, {
+            minWidth: '250px',
+            width: '50vw',
+            data: newUser
+        });
+    }
+
+    out(): void {
+        delete localStorage.token;
+        delete sessionStorage.token;
+    }
 }

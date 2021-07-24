@@ -1,0 +1,25 @@
+<mat-spinner *ngIf="!loaded;else content" [diameter]="50"></mat-spinner>
+<ng-template #content>
+	<mat-card *ngFor="let product of displayProducts" class="mat-elevation-z8">
+		<mat-card-title>{{product.name}}</mat-card-title>
+		<mat-card-content>${{product.cost}}</mat-card-content>
+		<mat-card-actions>
+			<button mat-raised-button color="accent" (click)="add(product.name, product._id!)">Add</button>
+			<span>
+				<button *ngIf="isAuth && user?.role === role.admin" mat-raised-button color="warn" (click)="editor(product)">Edit</button>
+				<button *ngIf="isAuth && user?.role === role.admin" mat-raised-button color="warn" (click)="remove(product._id!)">Delete</button>
+			</span>
+		</mat-card-actions>
+	</mat-card>
+	<mat-paginator
+			[length]="products.length"
+			[pageSize]="defPageSize"
+			[pageSizeOptions]="[5, 10]"
+			(page)="setPage($event)"
+	></mat-paginator>
+	<mat-card *ngIf="isAuth && user?.role === role.admin">
+		<mat-card-actions>
+			<button mat-raised-button color="warn" (click)="editor(null)">New</button>
+		</mat-card-actions>
+	</mat-card>
+</ng-template>

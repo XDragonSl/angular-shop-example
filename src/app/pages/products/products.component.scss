@@ -1,0 +1,7 @@
+@import "../../shared/styles/spinner";
+@import "../../shared/styles/card";
+
+mat-card-actions {
+	display: flex;
+	justify-content: space-between;
+}
